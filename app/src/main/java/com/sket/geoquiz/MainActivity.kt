@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,9 +15,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.sket.geoquiz.ui.theme.GeoQuizTheme
 
 class MainActivity : ComponentActivity() {
@@ -26,13 +31,34 @@ class MainActivity : ComponentActivity() {
         setContent {
             GeoQuizTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
+                    QuestionScreen(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
                     )
                 }
             }
         }
+    }
+}
+
+@Composable
+fun QuestionScreen(modifier: Modifier = Modifier) {
+    val (isAnswered, setIsAnswered) = remember { mutableStateOf(false) }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(32.dp)
+    ) {
+        TrueFalseButtonsRow(
+            onTrueClick = { setIsAnswered(true) },
+            onFalseClick = { setIsAnswered(true) },
+            isAnswered = isAnswered,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 
@@ -45,14 +71,19 @@ fun TrueFalseButtonsRow(
 ) {
     val rowAlpha = if (isAnswered) 0.0f else 1.0f
 
-    Row(modifier = modifier.fillMaxWidth().alpha(rowAlpha), horizontalArrangement = Arrangement.SpaceAround) {
-        Button(onClick = onTrueClick, enabled = !isAnswered,) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .alpha(rowAlpha),
+        horizontalArrangement = Arrangement.SpaceAround
+    ) {
+        Button(onClick = onTrueClick, enabled = !isAnswered) {
             Text(
                 text = "True",
                 style = MaterialTheme.typography.titleMedium
             )
         }
-        Button(onClick = onFalseClick, enabled = !isAnswered,) {
+        Button(onClick = onFalseClick, enabled = !isAnswered) {
             Text(
                 text = "False",
                 style = MaterialTheme.typography.titleMedium
