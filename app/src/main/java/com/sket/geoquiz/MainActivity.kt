@@ -4,12 +4,18 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.tooling.preview.Preview
 import com.sket.geoquiz.ui.theme.GeoQuizTheme
 
@@ -26,6 +32,31 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun TrueFalseButtonsRow(
+    onTrueClick: () -> Unit,
+    onFalseClick: () -> Unit,
+    isAnswered: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val rowAlpha = if (isAnswered) 0.0f else 1.0f
+
+    Row(modifier = modifier.fillMaxWidth().alpha(rowAlpha), horizontalArrangement = Arrangement.SpaceAround) {
+        Button(onClick = onTrueClick, enabled = !isAnswered,) {
+            Text(
+                text = "True",
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+        Button(onClick = onFalseClick, enabled = !isAnswered,) {
+            Text(
+                text = "False",
+                style = MaterialTheme.typography.titleMedium
+            )
         }
     }
 }
