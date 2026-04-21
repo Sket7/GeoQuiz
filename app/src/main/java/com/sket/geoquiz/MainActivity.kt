@@ -58,6 +58,17 @@ val questions = listOf(
 fun QuestionScreen(modifier: Modifier = Modifier) {
     val (currentIndex, setCurrentIndex) = remember { mutableIntStateOf(0) }
     val (isAnswered, setIsAnswered) = remember { mutableStateOf(false) }
+    val (countTrue, setCountTrue) = remember { mutableIntStateOf(0) }
+
+    val check: (Boolean) -> Unit = { userAnswer ->
+        val question = questions[currentIndex]
+        val isRight = question.isTrue == userAnswer
+        setIsAnswered(true)
+        if (isRight) {
+            setCountTrue(countTrue + 1)
+        }
+        setCurrentIndex( currentIndex + 1 )
+    }
 
 
     val currentQuestion = questions[currentIndex]
@@ -74,8 +85,8 @@ fun QuestionScreen(modifier: Modifier = Modifier) {
             textAlign = TextAlign.Center
         )
         TrueFalseButtonsRow(
-            onTrueClick = { setIsAnswered(true) },
-            onFalseClick = { setIsAnswered(true) },
+            onTrueClick = { check(true) },
+            onFalseClick = { check(false) },
             isAnswered = isAnswered,
             modifier = Modifier.fillMaxWidth()
         )
