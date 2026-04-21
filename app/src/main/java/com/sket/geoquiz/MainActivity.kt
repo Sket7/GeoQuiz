@@ -10,7 +10,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -23,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.sket.geoquiz.ui.theme.GeoQuizTheme
 
 class MainActivity : ComponentActivity() {
@@ -78,23 +83,44 @@ fun QuestionScreen(modifier: Modifier = Modifier) {
         setIsAnswered(false)
     }
 
-    val currentQuestion = questions[currentIndex]
-    if (isFinal) {
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(32.dp)
-        ) {
-            Text(
-                text = "Ваше количесво правильных ответов $countTrue",
-                style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center
-            )
+    val onRestart: () -> Unit = {
+        setCurrentIndex(0)
+        setIsAnswered(false)
+        setCountTrue(0)
+    }
 
+    if (isFinal) {
+        Dialog(onDismissRequest = onRestart) {
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(24.dp),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = "Тест завершён!",
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                    Text(
+                        text = "Ваше количество правильных ответов: $countTrue из ${questions.size}",
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center
+                    )
+                    Button(
+                        onClick = onRestart,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Пройти заново")
+                    }
+                }
+            }
         }
     } else {
+        val currentQuestion = questions[currentIndex]
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -107,6 +133,7 @@ fun QuestionScreen(modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center
             )
+            HorizontalDivider(thickness = 2.dp)
             TrueFalseButtonsRow(
                 onTrueClick = { onCheck(true) },
                 onFalseClick = { onCheck(false) },
