@@ -60,16 +60,20 @@ fun QuestionScreen(modifier: Modifier = Modifier) {
     val (isAnswered, setIsAnswered) = remember { mutableStateOf(false) }
     val (countTrue, setCountTrue) = remember { mutableIntStateOf(0) }
 
-    val check: (Boolean) -> Unit = { userAnswer ->
+    val onCheck: (Boolean) -> Unit = { userAnswer ->
         val question = questions[currentIndex]
         val isRight = question.isTrue == userAnswer
         setIsAnswered(true)
         if (isRight) {
             setCountTrue(countTrue + 1)
         }
-        setCurrentIndex( currentIndex + 1 )
+
     }
 
+    val onNextClick: () -> Unit = {
+        setCurrentIndex( currentIndex + 1 )
+        setIsAnswered(false)
+    }
 
     val currentQuestion = questions[currentIndex]
     Column(
@@ -85,10 +89,15 @@ fun QuestionScreen(modifier: Modifier = Modifier) {
             textAlign = TextAlign.Center
         )
         TrueFalseButtonsRow(
-            onTrueClick = { check(true) },
-            onFalseClick = { check(false) },
-            isAnswered = isAnswered,
-            modifier = Modifier.fillMaxWidth()
+            onTrueClick = { onCheck(true) },
+            onFalseClick = { onCheck(false) },
+            enabled = !isAnswered,
+            modifier = Modifier.fillMaxWidth().alpha(if (isAnswered) 0.0f else 1.0f)
+        )
+        NextButtonRow(
+            onNextClick = onNextClick,
+            enabled = isAnswered,
+            modifier = Modifier.fillMaxWidth().alpha(if (isAnswered) 1.0f else 0.0f),
         )
     }
 }
@@ -97,26 +106,42 @@ fun QuestionScreen(modifier: Modifier = Modifier) {
 fun TrueFalseButtonsRow(
     onTrueClick: () -> Unit,
     onFalseClick: () -> Unit,
-    isAnswered: Boolean,
+    enabled: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val rowAlpha = if (isAnswered) 0.0f else 1.0f
-
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .alpha(rowAlpha),
+        modifier = modifier,
         horizontalArrangement = Arrangement.SpaceAround
     ) {
-        Button(onClick = onTrueClick, enabled = !isAnswered) {
+        Button(onClick = onTrueClick, enabled = enabled) {
             Text(
                 text = "True",
                 style = MaterialTheme.typography.titleMedium
             )
         }
-        Button(onClick = onFalseClick, enabled = !isAnswered) {
+        Button(onClick = onFalseClick, enabled = enabled) {
             Text(
                 text = "False",
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+    }
+}
+
+@Composable
+fun NextButtonRow(
+    onNextClick:()-> Unit,
+    enabled: Boolean,
+    modifier: Modifier = Modifier
+) {
+
+    Row(
+        modifier =modifier,
+        horizontalArrangement = Arrangement.End
+    ) {
+        Button(onClick = onNextClick, enabled = enabled) {
+            Text(
+                text = "Next",
                 style = MaterialTheme.typography.titleMedium
             )
         }
