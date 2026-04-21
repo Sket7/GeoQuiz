@@ -60,46 +60,71 @@ fun QuestionScreen(modifier: Modifier = Modifier) {
     val (isAnswered, setIsAnswered) = remember { mutableStateOf(false) }
     val (countTrue, setCountTrue) = remember { mutableIntStateOf(0) }
 
-    val onCheck: (Boolean) -> Unit = { userAnswer ->
-        val question = questions[currentIndex]
-        val isRight = question.isTrue == userAnswer
-        setIsAnswered(true)
-        if (isRight) {
-            setCountTrue(countTrue + 1)
-        }
+    val isFinal = questions.size <= currentIndex + 1
 
+    val onCheck: (Boolean) -> Unit = { userAnswer ->
+        questions.getOrNull(currentIndex).let { question ->
+            if (question == null) return@let
+            val isRight = question.isTrue == userAnswer
+            setIsAnswered(true)
+            if (isRight) {
+                setCountTrue(countTrue + 1)
+            }
+        }
     }
 
     val onNextClick: () -> Unit = {
-        setCurrentIndex( currentIndex + 1 )
+        setCurrentIndex(currentIndex + 1)
         setIsAnswered(false)
     }
 
     val currentQuestion = questions[currentIndex]
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(32.dp)
-    ) {
-        Text(
-            text = currentQuestion.text,
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center
-        )
-        TrueFalseButtonsRow(
-            onTrueClick = { onCheck(true) },
-            onFalseClick = { onCheck(false) },
-            enabled = !isAnswered,
-            modifier = Modifier.fillMaxWidth().alpha(if (isAnswered) 0.0f else 1.0f)
-        )
-        NextButtonRow(
-            onNextClick = onNextClick,
-            enabled = isAnswered,
-            modifier = Modifier.fillMaxWidth().alpha(if (isAnswered) 1.0f else 0.0f),
-        )
+    if (isFinal) {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(32.dp)
+        ) {
+            Text(
+                text = "Ваше количесво правильных ответов $countTrue",
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center
+            )
+
+        }
+    } else {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(32.dp)
+        ) {
+            Text(
+                text = currentQuestion.text,
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center
+            )
+            TrueFalseButtonsRow(
+                onTrueClick = { onCheck(true) },
+                onFalseClick = { onCheck(false) },
+                enabled = !isAnswered,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .alpha(if (isAnswered) 0.0f else 1.0f)
+            )
+            NextButtonRow(
+                onNextClick = onNextClick,
+                enabled = isAnswered,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .alpha(if (isAnswered) 1.0f else 0.0f),
+            )
+        }
     }
+
 }
 
 @Composable
@@ -130,13 +155,12 @@ fun TrueFalseButtonsRow(
 
 @Composable
 fun NextButtonRow(
-    onNextClick:()-> Unit,
+    onNextClick: () -> Unit,
     enabled: Boolean,
     modifier: Modifier = Modifier
 ) {
-
     Row(
-        modifier =modifier,
+        modifier = modifier,
         horizontalArrangement = Arrangement.End
     ) {
         Button(onClick = onNextClick, enabled = enabled) {
